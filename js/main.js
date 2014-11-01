@@ -21,27 +21,28 @@ var mapObj = (function(){
 
                 var cur = result.curSelect;
                 if(key===40){//down
-                    if(cur + 1 < result.childNodes.length){
-                        if(result.childNodes[cur]){
-                            result.childNodes[cur].style.background='';
+                    if(cur + 1 < result.children.length){
+                        if(result.children[cur]){
+                            result.children[cur].style.background='';
                         }
                         result.curSelect=cur+1;
-                        result.childNodes[cur+1].style.background='#CAE1FF';
+                        result.children[cur+1].style.background='#CAE1FF';
                         d.getElementById(input).value = result.tipArr[cur+1].name;
                     }
                 }else if(key===38){//up
                     if(cur-1>=0){
-                        if(result.childNodes[cur]){
-                            result.childNodes[cur].style.background='';
+                        if(result.children[cur]){
+                            result.children[cur].style.background='';
                         }
                         result.curSelect=cur-1;
-                        result.childNodes[cur-1].style.background='#CAE1FF';
+                        result.children[cur-1].style.background='#CAE1FF';
                         d.getElementById(input).value = result.tipArr[cur-1].name;
                     }
                 }else if(key === 13){
+                    //debugger;
                     var res = d.getElementById(input);
                     if(res && res['curSelect'] !== -1){
-                        self.selectResult(d.getElementById(result).curSelect);
+                        self.selectResult(result.curSelect);
                     }
                 }else{
                     self.autoSearch();
@@ -84,14 +85,12 @@ var mapObj = (function(){
                 var resultStr = "";
                 var tipArr = data.tips;
                 if (tipArr&&tipArr.length>0) {
-                    for (var i = 0; i < tipArr.length; i++) {
-                        resultStr += "<div class='divid' id='divid"  + (i + 1) + "' data-mouseover=" + (i + 1)
-                        + " data-select=" + i + " data-mouseout=" + (i + 1)
-                         + "data=" + tipArr[i].adcode + ">" + tipArr[i].name + "<span style='color:#C1C1C1;'>"+ tipArr[i].district + "</span></div>";
-                    }
-                }
-                else  {
-                    resultStr = " π__π 亲,人家找不到结果!<br />要不试试：<br />1.请确保所有字词拼写正确<br />2.尝试不同的关键字<br />3.尝试更宽泛的关键字";
+                    //for (var i = 0; i < tipArr.length; i++) {
+                    //    resultStr += "<div class='divid' id='divid"  + (i + 1) + "' data-mouseover=" + (i + 1)
+                    //    + " data-select=" + i + " data-mouseout=" + (i + 1)
+                    //     + "data=" + tipArr[i].adcode + ">" + tipArr[i].name + "<span style='color:#C1C1C1;'>"+ tipArr[i].district + "</span></div>";
+                    //}
+                    resultStr = _.template($("#list_template").html())({ tipArr : tipArr});
                 }
 
                 result[0].curSelect = -1;
@@ -153,8 +152,11 @@ var mapObj = (function(){
                 }
                 //截取输入提示的关键字部分
                 //debugger;
-                var text = d.getElementById("divid" + (index + 1)).innerHTML.replace(/<[^>].*?>.*<\/[^>].*?>/g,"");
+
+                var text = d.getElementById("divid" + (index + 1)).innerHTML.replace(/\s|<[^>].*?>.*<\/[^>].*?>/g,"");
+
                 var cityCode = d.getElementById("divid" + (index + 1)).getAttribute('data');
+                console.log(text);
                 d.getElementById(input).value = text;
                 d.getElementById(result).style.display = "none";
                 //根据选择的输入提示关键字查询
@@ -290,9 +292,13 @@ var mapObj = (function(){
             });
 
             if(config.autoComplete){
-                d.getElementById(config.autoComplete.input).addEventListener('keyup', function(){
+                //d.getElementById(config.autoComplete.input).addEventListener('keyup', function(){
+                //    autoComplete.keydown.call(config.autoComplete);
+                //}, false);
+                $("#" + config.autoComplete.input).on('keyup', function(){
                     autoComplete.keydown.call(config.autoComplete);
-                }, false);
+                });
+
             }
 
             return mapObj;
