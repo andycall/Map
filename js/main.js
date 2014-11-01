@@ -4,6 +4,7 @@ var mapObj = (function(){
 
     return function(config){
         var autoComplete  = config.autoComplete;
+        var drag = config.drag;
 
         // 自动补全模块 + 地图响应
         if(autoComplete){
@@ -304,6 +305,36 @@ var mapObj = (function(){
             return mapObj;
         };
 
+        if(drag){
+            (function (){
+                var _dNode = $('.drag-pin'),
+                    _cont = $('.container'),
+                    _patchDragWrapOffset = _dNode.offset();
+
+                _dNode.mousedown(function(){
+                    var _patchH = parseInt($(this).css('height')) / 2,
+                        _patchW = parseInt($(this).css('width')) / 2;
+                    _dNode.addClass('drag-ing');
+                    _cont.mousemove(function(eve){
+                        var _x = eve.clientX,
+                            _y = eve.clientY,
+                            _patchContOffset = _cont.offset();
+                            l = _x - _patchDragWrapOffset.left - _patchContOffset.left - _patchW,  //相对于 drag-wrap 的位置
+                            t = _y - _patchDragWrapOffset.top - _patchContOffset.top - _patchH;
+                        console.log(eve, _patchDragWrapOffset, _patchContOffset);
+                        _dNode.css({top: t, left: l});
+
+                        _cont.mouseup(function(){
+                            $(this).unbind('mousemove');
+                            _dNode.removeClass('drag-ing');
+                        })
+                    });
+
+                });
+            })();
+        }else{
+            $('.drap-main').css('display', 'none');
+        }
         return mapObj;
     }
 }());

@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title></title>
     <style>
+        body{
+            margin: 0;
+        }
         .container {
             position: relative;
             margin: 0 auto;
@@ -30,6 +33,36 @@
         .secid{
             background: #fff;
         }
+
+        /* ling */
+        .drag-wrap{
+            position: absolute;
+            top: 110px;
+            left: 50px;;
+            width: 42px;
+            height: 42px;
+            padding: 1px 0 0 11px;
+            z-index: 1;
+            box-sizing: border-box;
+            border-radius: 2px;
+            background: #FFF;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(0, 0, 0, 0);
+        }
+
+        .drag-pin{
+            display: block;
+            position: relative;
+            width: 28px;
+            height: 34px;
+            background: url("image/map-sprites.png") 0 -140px;
+            cursor: move;
+        }
+
+        .drag-ing{
+            background-position: -30px -140px;
+        }
+        /* end ling */
     </style>
     <script>
         window.onload = function(){
@@ -47,6 +80,9 @@
         <div class="search">
             <input type="text" id="keyword" name="keyword" value=""  style="width: 95%;"/>
             <div id="result1" name="result1" style="overflow: auto; width: 95%; border: 1px solid gray;display: none;"></div>
+        </div>
+        <div class="drag-wrap">
+            <div class="drag-pin"></div>
         </div>
     </div>
 </body>
@@ -78,7 +114,9 @@
         // 工具栏
         toolBar : {
 
-        }
+        },
+
+        drag: {}
 
     }).init();
 </script>
