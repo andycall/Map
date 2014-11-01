@@ -4,6 +4,8 @@ var mapObj = (function(){
 
     return function(config){
         var autoComplete  = config.autoComplete;
+        var drag          = config.drag;
+
 
         // 自动补全模块 + 地图响应
         if(autoComplete){
@@ -168,7 +170,6 @@ var mapObj = (function(){
                 });
             };
 
-
             //定位选择输入提示关键字
             autoComplete.focus_callback = function() {
                 var self = this,
@@ -275,10 +276,16 @@ var mapObj = (function(){
 
                 return str;
             };
-
         }
         else{
             $('.search').css('display', 'none');
+        }
+
+
+        if(config.drag){
+            drag.abc = function(){
+
+            }
         }
 
         mapObj.init = function(){
@@ -298,7 +305,6 @@ var mapObj = (function(){
                 $("#" + config.autoComplete.input).on('keyup', function(){
                     autoComplete.keydown.call(config.autoComplete);
                 });
-
             }
 
             return mapObj;
