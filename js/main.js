@@ -299,9 +299,6 @@ var mapObj = (function(){
             });
 
             if(config.autoComplete){
-                //d.getElementById(config.autoComplete.input).addEventListener('keyup', function(){
-                //    autoComplete.keydown.call(config.autoComplete);
-                //}, false);
                 $("#" + config.autoComplete.input).on('keyup', function(){
                     autoComplete.keydown.call(config.autoComplete);
                 });
