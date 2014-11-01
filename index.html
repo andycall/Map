@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        .container {
+            position: relative;
+            margin: 0 auto;
+            border: 1px solid #000;
+        }
+
+        .search {
+            position: absolute;
+            z-index: 100;
+            top: 50px;
+            left: 50px;
+            width: 30%;
+        }
+        .search input{
+            padding: 10px 5px;
+            font-size: 20px;
+        }
+        .divid{
+            font-size: 13px;
+            cursor:pointer;
+            padding:5px 5px 5px 5px;
+            background: #fff;
+        }
+        .secid{
+            background: #fff;
+        }
+    </style>
+    <script>
+        window.onload = function(){
+            var windowWidth = window.innerWidth,
+                    windowHeight = window.innerHeight,
+                    container = document.querySelector('.container');
+
+            container.style.width = windowWidth * 0.9 + 'px';
+            container.style.height = windowHeight * 0.9 + 'px';
+        }
+    </script>
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="search">
+            <input type="text" id="keyword" name="keyword" value=""  style="width: 95%;"/>
+            <div id="result1" name="result1" style="overflow: auto; width: 95%; border: 1px solid gray;display: none;"></div>
+        </div>
+    </div>
+</body>
+<script src="http://webapi.amap.com/maps?v=1.3&key=ca56cd94a180aec9342b05d84954a75e"></script>
+<script src="js/jquery.js"></script>
+<script src="js/main.js"></script>
+<script>
+    mapObj({
+        // 开启搜索框搜索
+        autoComplete : {
+            input: "keyword", // 输入框ID
+            result : "result1" // 结果框ID
+        }
+    }).init();
+</script>
+</html>
