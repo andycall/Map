@@ -4,13 +4,7 @@ var mapObj = (function(){
 
     return function(config){
         var autoComplete  = config.autoComplete;
-<<<<<<< HEAD
         var drag = config.drag;
-=======
-        var drag          = config.drag;
-
->>>>>>> 4f5fddc954d436d9443d4ed662cee9de40b46a86
-
         // 自动补全模块 + 地图响应
         if(autoComplete){
 
