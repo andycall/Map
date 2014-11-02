@@ -281,13 +281,6 @@ var mapObj = (function(){
             $('.search').css('display', 'none');
         }
 
-
-        if(config.drag){
-            drag.abc = function(){
-
-            }
-        }
-
         mapObj.init = function(){
 
             mapObj = new AMap.Map("container",{
