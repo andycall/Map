@@ -308,28 +308,73 @@ var mapObj = (function(){
             (function (){
                 var _dNode = $('.drag-pin'),
                     _cont = $('.container'),
-                    _patchDragWrapOffset = _dNode.offset();
+                    _patchDragOriOffset = _dNode.offset();
 
-                _dNode.mousedown(function(){
-                    var _patchH = parseInt($(this).css('height')) / 2,
+
+                _dNode.mousedown(function() {
+                    var _patchH = parseInt($(this).css('height')),
                         _patchW = parseInt($(this).css('width')) / 2;
                     _dNode.addClass('drag-ing');
+                    var _patchContOffset = _cont.offset(),
+                        _patchDragWrapOffset;
+
                     _cont.mousemove(function(eve){
                         var _x = eve.clientX,
                             _y = eve.clientY,
-                            _patchContOffset = _cont.offset();
-                            l = _x - _patchDragWrapOffset.left - _patchContOffset.left - _patchW,  //相对于 drag-wrap 的位置
-                            t = _y - _patchDragWrapOffset.top - _patchContOffset.top - _patchH;
-                        console.log(eve, _patchDragWrapOffset, _patchContOffset);
-                        _dNode.css({top: t, left: l});
+                            _patchDragWrapOffset = _dNode.offset(),
 
-                        _cont.mouseup(function(){
-                            $(this).unbind('mousemove');
-                            _dNode.removeClass('drag-ing');
-                        })
+                            l = _x - _patchContOffset.left - _patchDragOriOffset.left - _patchW,  //相对于 drag-wrap 的位置
+                            t = _y - _patchContOffset.top - _patchDragOriOffset.top - _patchH;
+                        _dNode.css({top: t, left: l});
+                        console.log(_x, _y);
+                    }).mouseup(function(){
+                        _dNode.removeClass('drag-ing');
+                        var containerPixelPos = fromContainerPixelToLngLat(_dNode.offset().left - _patchContOffset.left, _dNode.offset().top - _patchContOffset.top + _patchH)
+//                        console.log(_dNode.offset().left - _patchContOffset.left, _dNode.offset().top - _patchContOffset.top);
+                        _dNode.attr('data-lat', containerPixelPos.lat);
+                        _dNode.attr('data-lng', containerPixelPos.lng);
+                        var marker = new AMap.Marker({
+                            icon: new AMap.Icon({    //复杂图标
+                                size: new AMap.Size(28, 34),//图标大小
+                                image: "image/map-sprites.png", //大图地址
+                                imageOffset: new AMap.Pixel(0, -140)//相对于大图的取图位置
+                            }),
+                            position: new AMap.LngLat(containerPixelPos.lng, containerPixelPos.lat),
+                            draggable:true, //点标记可拖拽
+                            cursor:'move',  //鼠标悬停点标记时的鼠标样式
+                            raiseOnDrag: true//鼠标拖拽点标记时开启点标记离开地图的效果
+                        });
+                        marker.setMap(mapObj);  //在地图上添加点
+                        _cont.unbind('mousemove');
+                        _dNode.css({top: 0, left: 0});
                     });
 
                 });
+
+                function fromContainerPixelToLngLat (left, top){
+                    var ll = mapObj.containTolnglat(new AMap.Pixel(left ,top));
+                    return {lng: ll.getLng(), lat: ll.getLat()};
+                }
+
+                function fromLngLatToContainerPixel (lng, lat) {
+                    var pixel = mapObj.lnglatTocontainer(new AMap.LngLat(lng, lat));
+                    return {x: pixel.getX(), y: pixel.getY()};
+                }
+
+//                var marker = new AMap.Marker({
+//                    position: mapObj.getCenter(),
+//                    draggable:true, //点标记可拖拽
+//                    cursor:'move',  //鼠标悬停点标记时的鼠标样式
+//                    raiseOnDrag:true//鼠标拖拽点标记时开启点标记离开地图的效果
+//
+//                });
+//                marker.setMap(mapObj);
+                //TODO for debug
+                AMap.event.addListener(mapObj, 'click', function(e){
+                    console.log(e.lnglat.getLng(), e.lnglat.getLat());
+                });
+
+
             })();
         }else{
             $('.drap-main').css('display', 'none');
