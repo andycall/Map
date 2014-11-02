@@ -310,15 +310,19 @@ var mapObj = (function(){
                     _cont = $('.container'),
                     _patchDragOriOffset = _dNode.offset();
 
-
-                _dNode.mousedown(function() {
+                function mousedown(eve){
                     var _patchH = parseInt($(this).css('height')),
                         _patchW = parseInt($(this).css('width')) / 2;
                     _dNode.addClass('drag-ing');
                     var _patchContOffset = _cont.offset(),
                         _patchDragWrapOffset;
 
-                    _cont.mousemove(function(eve){
+                    _cont.on('mousemove', mousemove(_patchH, _patchW, _patchContOffset, _patchDragWrapOffset));
+                    _cont.on('mouseup', mouseup(_patchH, _patchW, _patchContOffset, _patchDragWrapOffset));
+                }
+
+                function mousemove(_patchH, _patchW, _patchContOffset, _patchDragWrapOffset){
+                    return function(eve){
                         var _x = eve.clientX,
                             _y = eve.clientY,
                             _patchDragWrapOffset = _dNode.offset(),
@@ -326,8 +330,11 @@ var mapObj = (function(){
                             l = _x - _patchContOffset.left - _patchDragOriOffset.left - _patchW,  //相对于 drag-wrap 的位置
                             t = _y - _patchContOffset.top - _patchDragOriOffset.top - _patchH;
                         _dNode.css({top: t, left: l});
-                        console.log(_x, _y);
-                    }).mouseup(function(){
+                    }
+                }
+
+                function mouseup(_patchH, _patchW, _patchContOffset, _patchDragWrapOffset){
+                    return function(eve) {
                         _dNode.removeClass('drag-ing');
                         var containerPixelPos = fromContainerPixelToLngLat(_dNode.offset().left - _patchContOffset.left, _dNode.offset().top - _patchContOffset.top + _patchH)
 //                        console.log(_dNode.offset().left - _patchContOffset.left, _dNode.offset().top - _patchContOffset.top);
@@ -345,11 +352,13 @@ var mapObj = (function(){
                             raiseOnDrag: true//鼠标拖拽点标记时开启点标记离开地图的效果
                         });
                         marker.setMap(mapObj);  //在地图上添加点
-                        _cont.unbind('mousemove');
+                        _cont.off('mousemove');
+                        _cont.off('mouseup');
                         _dNode.css({top: 0, left: 0});
-                    });
+                    }
+                }
 
-                });
+                _dNode.on('mousedown', mousedown);
 
                 function fromContainerPixelToLngLat (left, top){
                     var ll = mapObj.containTolnglat(new AMap.Pixel(left ,top));
@@ -370,10 +379,9 @@ var mapObj = (function(){
 //                });
 //                marker.setMap(mapObj);
                 //TODO for debug
-                AMap.event.addListener(mapObj, 'click', function(e){
-                    console.log(e.lnglat.getLng(), e.lnglat.getLat());
-                });
-
+                //AMap.event.addListener(mapObj, 'click', function(e){
+                //    console.log(e.lnglat.getLng(), e.lnglat.getLat());
+                //});
 
             })();
         }else{
