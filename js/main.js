@@ -1,5 +1,11 @@
 var mapObj = (function(){
-    var mapObj = {},
+    var mapObj = new AMap.Map("container",{
+            view: new AMap.View2D({
+                center:new AMap.LngLat(106.53791,29.549537),//地图中心点
+                zoom:12 //地图显示的缩放级别
+            }),
+            keyboardEnable:false
+        }),
         d = document;
 
     return function(config){
@@ -296,22 +302,12 @@ var mapObj = (function(){
         }
 
         mapObj.init = function(){
-
-            mapObj = new AMap.Map("container",{
-                view: new AMap.View2D({
-                    center:new AMap.LngLat(106.53791,29.549537),//地图中心点
-                    zoom:12 //地图显示的缩放级别
-                }),
-                keyboardEnable:false
-            });
-
             if(config.autoComplete){
                 $("#" + config.autoComplete.input).on('keyup', function(){
                     autoComplete.keydown.call(config.autoComplete);
                 });
             }
 
-            return mapObj;
         };
 
         if(drag){
