@@ -417,7 +417,7 @@ var mapObj = (function(){
                 function mouseup(_patchH, _patchW, _patchContOffset, _patchDragWrapOffset){
                     return function(eve) {
                         _dNode.removeClass('drag-ing');
-                        var containerPixelPos = fromContainerPixelToLngLat(_dNode.offset().left - _patchContOffset.left, _dNode.offset().top - _patchContOffset.top + _patchH)
+                        var containerPixelPos = fromContainerPixelToLngLat(_dNode.offset().left - _patchContOffset.left, _dNode.offset().top - _patchContOffset.top + _patchH);
 //                        console.log(_dNode.offset().left - _patchContOffset.left, _dNode.offset().top - _patchContOffset.top);
                         _dNode.attr('data-lat', containerPixelPos.lat);
                         _dNode.attr('data-lng', containerPixelPos.lng);
@@ -433,62 +433,23 @@ var mapObj = (function(){
                             raiseOnDrag: true//鼠标拖拽点标记时开启点标记离开地图的效果
                         });
                         marker.setMap(mapObj);  //在地图上添加点
-                        AMap.event.addListener(marker, 'click', function(){ //鼠标点击marker弹出自定义的信息窗体
-                            infoWindow.open(mapObj, marker.getPosition());
-                        });
+
                         //实例化信息窗体
                         var infoWindow = new AMap.InfoWindow({
-                            isCustom:true,  //使用自定义窗体
-                            content:createInfoWindow('方恒假日酒店&nbsp;&nbsp;<span style="font-size:11px;color:#F00;">价格:318</span>',"<img src='http://tpc.googlesyndication.com/simgad/5843493769827749134' style='position:relative;float:left;margin:0 5px 5px 0;'>地址：北京市朝阳区阜通东大街6号院3号楼 东北 8.3 公里<br/>电话：010 64733333<br/><a href='http://baike.baidu.com/view/6748574.htm'>详细信息</a>"),
+                            isCustom: true,  //使用自定义窗体
+                            content: mapObj.pointWindow(containerPixelPos.lng, containerPixelPos.lat),
                             offset: new AMap.Pixel(110, -25)//-113, -140
                         });
-                        infoWindow.open(mapObj, marker.getPosition());
-                        //构建自定义信息窗体
-                        function createInfoWindow(title,content){
-                            var info = document.createElement("div");
-                            info.className = "info";
 
-                            //可以通过下面的方式修改自定义窗体的宽高
-                            //info.style.width = "400px";
-
-                            // 定义顶部标题
-                            var top = document.createElement("div");
-                            top.className = "info-top";
-                            var titleD = document.createElement("div");
-                            titleD.innerHTML = title;
-                            var closeX = document.createElement("img");
-                            closeX.src = "http://webapi.amap.com/images/close2.gif";
-                            closeX.onclick = closeInfoWindow;
-
-                            top.appendChild(titleD);
-                            top.appendChild(closeX);
-                            info.appendChild(top);
-
-
-                            // 定义中部内容
-                            var middle = document.createElement("div");
-                            middle.className = "info-middle";
-                            middle.style.backgroundColor='white';
-                            middle.innerHTML = content;
-                            info.appendChild(middle);
-
-                            // 定义底部内容
-                            var bottom = document.createElement("div");
-                            bottom.className = "info-bottom";
-                            bottom.style.position = 'relative';
-                            bottom.style.top = '0px';
-                            bottom.style.margin = '0 auto';
-                            var sharp = document.createElement("img");
-                            sharp.src = "http://webapi.amap.com/images/sharp.png";
-                            bottom.appendChild(sharp);
-                            info.appendChild(bottom);
-                            return info;
-                        }
-
-                        //关闭信息窗体
-                        function closeInfoWindow(){
-                            mapObj.clearInfoWindow();
-                        }
+                        AMap.event.addListener(marker, 'mouseup', function(){ //鼠标点击marker弹出自定义的信息窗体
+                            var e = window.event, o = $(marker.$.r.B).offset();
+                            var containerPixelPos = fromContainerPixelToLngLat(o.left - _patchContOffset.left + 7, o.top - _patchContOffset.top + 2 *_patchH)
+                            var infoWindow = new AMap.InfoWindow({
+                                isCustom: true,  //使用自定义窗体
+                                content: mapObj.pointWindow(containerPixelPos.lng, containerPixelPos.lat),
+                                offset: new AMap.Pixel(110, -25)//-113, -140
+                            });
+                        });
 
                         _cont.off('mousemove');
                         _cont.off('mouseup');
