@@ -345,7 +345,7 @@ var mapObj = (function(){
                             raiseOnDrag: true//鼠标拖拽点标记时开启点标记离开地图的效果
                         });
                         marker.setMap(mapObj);  //在地图上添加点
-                        _cont.unbind('mousemove');
+                        _cont.off('mousemove');
                         _dNode.css({top: 0, left: 0});
                     });
 
