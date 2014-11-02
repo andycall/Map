@@ -187,7 +187,6 @@ var mapObj = (function(){
                     input = $("#" + self.input),
                     city = $("#" + self.city);
 
-
                 //清空地图上的InfoWindow和Marker
 
                 mapObj.clearMap();
@@ -208,20 +207,25 @@ var mapObj = (function(){
 
                 city.on('mouseover', 'li', function(ev){
                     var target = ev.currentTarget;
-
                     if(target.className == 'secid'){
                         var dataMouseover = parseInt(target.dataset['mouseover']);
-
-                        self.openMarkerTipById1(dataMouseover, target);
+                        self.openMarkerTipById(dataMouseover, target);
                     }
                 });
 
                 city.on('mouseout', 'li', function(ev){
                     var target = ev.currentTarget;
-
                     if(target.className == 'secid'){
                         var dataMouseOut = target.dataset['mouseout'];
                         self.onmouseout_iconStyle(dataMouseOut, target);
+                    }
+                });
+
+                city.on('click', 'li', function(ev){
+                    var target = ev.currentTarget;
+                    if(target.className == 'secid'){
+                        var dataMouseover = parseInt(target.dataset['mouseover']);
+                        self.openMarkerTipById1(dataMouseover, target);
                     }
                 });
             };
@@ -258,12 +262,13 @@ var mapObj = (function(){
                 var mar = new AMap.Marker(markerOption);
                 autoComplete.marker.push(new AMap.LngLat(lngX, latY));
 
+                var windowTemplate = _.template($("#windowInfo_template").html())({
+                    i : i,
+                    d : d
+                });
+
                 var infoWindow = new AMap.InfoWindow({
-                    content:"<h3><font color=\"#00a6ac\">  " +
-                            (i + 1) + ". " +
-                            d.name +
-                            "</font></h3>" +
-                            autoComplete.TipContents(d.type, d.address, d.tel),
+                    content: windowTemplate,
                     size:new AMap.Size(300, 0),
                     autoMove:true,
                     offset:new AMap.Pixel(0,-30)
