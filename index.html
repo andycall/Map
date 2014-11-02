@@ -3,67 +3,10 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title></title>
-    <style>
-        body{
-            margin: 0;
-        }
-        .container {
-            position: relative;
-            margin: 0 auto;
-            border: 1px solid #000;
-        }
-
-        .search {
-            position: absolute;
-            z-index: 100;
-            top: 50px;
-            left: 50px;
-            width: 30%;
-        }
-        .search input{
-            padding: 10px 5px;
-            font-size: 20px;
-        }
-        .divid{
-            font-size: 13px;
-            cursor:pointer;
-            padding:5px 5px 5px 5px;
-            background: #fff;
-        }
-        .secid{
-            background: #fff;
-        }
-
-        /* ling */
-        .drag-wrap{
-            position: absolute;
-            top: 110px;
-            left: 50px;;
-            width: 42px;
-            height: 42px;
-            padding: 1px 0 0 11px;
-            z-index: 1;
-            box-sizing: border-box;
-            border-radius: 2px;
-            background: #FFF;
-            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(0, 0, 0, 0);
-        }
-
-        .drag-pin{
-            display: block;
-            position: relative;
-            width: 28px;
-            height: 34px;
-            background: url("image/map-sprites.png") 0 -140px;
-            cursor: move;
-        }
-
-        .drag-ing{
-            background-position: -30px -140px;
-        }
-        /* end ling */
-    </style>
+    <link rel="stylesheet" href="css/main.css"/>
+    <link rel="stylesheet" href="css/search.css"/>
+    <link rel="stylesheet" href="css/drag.css"/>
+    <link rel="stylesheet" href="css/city.css"/>
     <script>
         window.onload = function(){
             var windowWidth = window.innerWidth,
@@ -84,16 +27,27 @@
         <div class="drag-wrap">
             <div class="drag-pin"></div>
         </div>
-        <div class="city">
-            <ul>
-                <li>
-
-                </li>
-            </ul>
+        <div class="city" id="city" style="display: none;">
         </div>
     </div>
 </body>
+
 <!-- Template  -->
+<script type="text/template" id="place_template">
+    <div>共<span>20</span>地址</div>
+    <ul>
+        <% for(var i = 0; i < resultCount; i ++){ %>
+        <li class="secid" data-mouseover="<%= i %>" data-mouseout="<%= i + 1 %>">
+            <div class="icon icon<%= i + 1 %>_b"></div>
+            <h2><%= poiArr[i].name %></h2>
+            <span><%= poiArr[i].address %></span>
+            <p>还有N个城市</p>
+        </li>
+        <%  autoComplete.addmarker(i, poiArr[i]); %>
+        <% } %>
+    </ul>
+</script>
+
 
 <!-- 地点列表模板 -->
 <script type="text/template" id="list_template">
@@ -114,7 +68,8 @@
         // 开启搜索框搜索
         autoComplete : {
             input: "keyword", // 输入框ID
-            result : "result1" // 结果框ID
+            result : "result1", // 结果框ID
+            city : "city"
         },
 
         // 工具栏

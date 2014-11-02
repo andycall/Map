@@ -158,7 +158,6 @@ var mapObj = (function(){
                 var text = d.getElementById("divid" + (index + 1)).innerHTML.replace(/\s|<[^>].*?>.*<\/[^>].*?>/g,"");
 
                 var cityCode = d.getElementById("divid" + (index + 1)).getAttribute('data');
-                console.log(text);
                 d.getElementById(input).value = text;
                 d.getElementById(result).style.display = "none";
                 //根据选择的输入提示关键字查询
@@ -185,7 +184,8 @@ var mapObj = (function(){
             autoComplete.placeSearch_CallBack = function(data){
                 var self = autoComplete,
                     input = $("#" + self.input),
-                    result = $("#" + self.result)
+                    city = $("#" + self.city);
+
 
                 //清空地图上的InfoWindow和Marker
 
@@ -194,42 +194,52 @@ var mapObj = (function(){
                 var resultStr1 = "";
                 var poiArr = data.poiList.pois;
                 var resultCount = poiArr.length;
-                for (var i = 0; i < resultCount; i++) {
-                    resultStr1 += "<div class='secid' id='divid" + (i + 1) + "' data-mouseover=" + i + " data-mouseout=" + (i + 1) + "><table><tr><td><img src=\"http://webapi.amap.com/images/" + (i + 1) + ".png\"></td>" + "<td><h3><font color=\"#00a6ac\">名称: " + poiArr[i].name + "</font></h3>";
 
-                    resultStr1 += autoComplete.TipContents(poiArr[i].type, poiArr[i].address, poiArr[i].tel) + "</td></tr></table></div>";
-                    autoComplete.addmarker(i, poiArr[i]);
-                }
+                resultStr1 = _.template($("#place_template").html())({
+                    resultCount : resultCount,
+                    autoComplete : autoComplete,
+                    poiArr      : poiArr
+                });
                 mapObj.setFitView();
-                result[0].innerHTML = resultStr1;
-                result[0].style.display = "block";
 
-                result.on('mouseover', 'div', function(ev){
+                city.html(resultStr1);
+                city.show();
+
+                city.on('mouseover', 'li', function(ev){
                     var target = ev.currentTarget;
 
                     if(target.className == 'secid'){
                         var dataMouseover = parseInt(target.dataset['mouseover']);
+
                         self.openMarkerTipById1(dataMouseover, target);
                     }
                 });
 
-                result.on('mouseout', 'div', function(ev){
+                city.on('mouseout', 'li', function(ev){
                     var target = ev.currentTarget;
 
                     if(target.className == 'secid'){
                         var dataMouseOut = target.dataset['mouseout'];
-                        self.onmouseout_MarkerStyle(dataMouseOut, target);
+                        self.onmouseout_iconStyle(dataMouseOut, target);
                     }
                 });
-
-
             };
 
             //鼠标滑过查询结果改变背景样式，根据id打开信息窗体
             autoComplete.openMarkerTipById1 = function(pointid, self){
                 self.style.background = '#CAE1FF';
-                //debugger;
                 autoComplete.windowsArr[pointid].open(mapObj, autoComplete.marker[pointid]);
+                $(".icon" + (parseInt(pointid) + 1) + "_b").each(function(index, value){
+                    value.className = "icon icon" + (parseInt(pointid) + 1);
+                });
+            };
+
+            autoComplete.onmouseout_iconStyle = function(pointid, self){
+                self.style.background = "";
+//                $(self).find('.icon')[0].className = "icon icon" + (parseInt(pointid)) + "_b";
+                $(".icon" + (parseInt(pointid))).each(function(index, value){
+                    value.className = "icon icon" + pointid + "_b";
+                });
             };
 
             autoComplete.addmarker = function(i, d){
@@ -241,14 +251,18 @@ var mapObj = (function(){
                 var latY = d.location.getLat();
                 var markerOption = {
                     map:mapObj,
-                    icon:"http://webapi.amap.com/images/" + (i + 1) + ".png",
+                    content : "<div class='icon icon" +  ( i + 1 )+ "_b'></div>",
                     position:new AMap.LngLat(lngX, latY)
                 };
                 var mar = new AMap.Marker(markerOption);
                 autoComplete.marker.push(new AMap.LngLat(lngX, latY));
 
                 var infoWindow = new AMap.InfoWindow({
-                    content:"<h3><font color=\"#00a6ac\">  " + (i + 1) + ". " + d.name + "</font></h3>" + autoComplete.TipContents(d.type, d.address, d.tel),
+                    content:"<h3><font color=\"#00a6ac\">  " +
+                            (i + 1) + ". " +
+                            d.name +
+                            "</font></h3>" +
+                            autoComplete.TipContents(d.type, d.address, d.tel),
                     size:new AMap.Size(300, 0),
                     autoMove:true,
                     offset:new AMap.Pixel(0,-30)

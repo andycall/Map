@@ -1,0 +1,33 @@
+.search {
+    position: absolute;
+    z-index: 100;
+    top: 50px;
+    left: 50px;
+    width: 500px;
+}
+.search #keyword {
+    width: 380px;
+}
+.search #result1 {
+    overflow: auto;
+    width: 392px;
+    border: 1px solid gray;
+    display: none;
+    z-index: 200;
+}
+#result1 .divid{
+    z-index: 20000;
+}
+.search input{
+    padding: 10px 5px;
+    font-size: 20px;
+}
+.divid{
+    font-size: 13px;
+    cursor:pointer;
+    padding:5px 5px 5px 5px;
+    background: #fff;
+}
+.secid{
+    background: #fff;
+}
