@@ -6,7 +6,56 @@ var mapObj = (function(){
             }),
             keyboardEnable:false
         }),
-        d = document;
+        d = document,
+        city_location = "重庆",
+        city_bound = {};
+
+    // 获取用户位置信息
+    mapObj.getCityInfo = (function(){
+        mapObj.plugin(["AMap.CitySearch"], function() {
+            //实例化城市查询类
+            var citysearch = new AMap.CitySearch();
+            //自动获取用户IP，返回当前城市
+            citysearch.getLocalCity();
+            //citysearch.getCityByIp("123.125.114.*");
+            AMap.event.addListener(citysearch, "complete", function(result){
+                if(result && result.city && result.bounds) {
+                    city_location = result.city;
+                    city_bound = result.bounds;
+                }
+                else {
+                    document.getElementById('info').innerHTML = "您当前所在城市："+result.info+"";
+                }
+            });
+            AMap.event.addListener(citysearch, "error", function(result){alert(result.info);});
+        });
+    })();
+
+
+    // 逆地理编码
+    mapObj.getCoder = function(){
+
+    };
+
+
+    //mapObj.getPlace = function(X, Y){
+    //    var cpoint = new AMap.LngLat(X, Y);
+    //
+    //    var MSearch;
+    //    //加载服务插件，实例化地点查询类
+    //    mapObj.plugin(["AMap.PlaceSearch"], function() {
+    //        MSearch = new AMap.PlaceSearch({
+    //            city: city_location
+    //        });
+    //        //查询成功时的回调函数
+    //        AMap.event.addListener(MSearch, "complete", placeSearch_CallBack);
+    //        //周边搜索
+    //        MSearch.searchNearBy("餐厅", cpoint, 500);
+    //    });
+    //
+    //};
+
+
 
     return function(config){
         var autoComplete  = config.autoComplete;
@@ -166,7 +215,7 @@ var mapObj = (function(){
                     var msearch = new AMap.PlaceSearch();  //构造地点查询类
                     AMap.event.addListener(msearch, "complete", self.placeSearch_CallBack); //查询成功时的回调函数
                     msearch.setCity(cityCode);
-                    msearch.search(text);  //关键字查询查询
+                    msearch.search(text);  //关键字查询
                 });
             };
 
@@ -217,7 +266,7 @@ var mapObj = (function(){
                     var target = ev.currentTarget;
                     if(target.className == 'secid'){
                         var dataMouseOut = target.dataset['mouseout'];
-                        self.onmouseout_iconStyle(dataMouseOut, target);
+                        self.onmouseout_MarkerStyle(dataMouseOut, target);
                     }
                 });
 
@@ -225,15 +274,22 @@ var mapObj = (function(){
                     var target = ev.currentTarget;
                     if(target.className == 'secid'){
                         var dataMouseover = parseInt(target.dataset['mouseover']);
-                        self.openMarkerTipById1(dataMouseover, target);
+                        self.openMarkerTipById1(dataMouseover, target, resultCount);
                     }
                 });
             };
 
             //鼠标滑过查询结果改变背景样式，根据id打开信息窗体
-            autoComplete.openMarkerTipById1 = function(pointid, self){
-                self.style.background = '#CAE1FF';
+            autoComplete.openMarkerTipById1 = function(pointid, that, resultCount){
+                that.style.background = '#CAE1FF';
                 autoComplete.windowsArr[pointid].open(mapObj, autoComplete.marker[pointid]);
+
+                for(var i = 0; i < resultCount; i ++){
+                    $(".icon" + (i + 1)).each(function(index, value){
+                        value.className = "icon icon" + ( i + 1 ) + "_b";
+                    });
+                }
+
                 $(".icon" + (parseInt(pointid) + 1) + "_b").each(function(index, value){
                     value.className = "icon icon" + (parseInt(pointid) + 1);
                 });
@@ -278,6 +334,7 @@ var mapObj = (function(){
                 AMap.event.addListener(mar, "click", aa);
             };
 
+
             autoComplete.TipContents = function(type, address, tel){
                 var self = this,
                     input = self.input,
@@ -302,11 +359,14 @@ var mapObj = (function(){
         }
 
         mapObj.init = function(){
+            var self = this;
             if(config.autoComplete){
                 $("#" + config.autoComplete.input).on('keyup', function(){
                     autoComplete.keydown.call(config.autoComplete);
                 });
             }
+
+
         };
 
         if(drag){

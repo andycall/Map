@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/search.css"/>
     <link rel="stylesheet" href="css/drag.css"/>
     <link rel="stylesheet" href="css/city.css"/>
+    <link rel="stylesheet" href="css/windowInfo.css"/>
     <script>
         window.onload = function(){
             var windowWidth = window.innerWidth,
@@ -50,7 +51,9 @@
 
 <!-- 显示信息框模板 -->
 <script type="text/template" id="windowInfo_template">
-    <h2 style="color: #00a6ac"><%= (i + 1) + ". "  + d.name %></h2>
+    <h2 class=""><%= d.name %></h2>
+    <p><%= d.address %></p>
+    <p>附近有<span>4</span>家餐厅</p>
 </script>
 
 <!-- 地点列表模板 -->
