@@ -67,25 +67,6 @@ var mapObj = (function(){
         });
     };
 
-    //mapObj.getPlace = function(X, Y){
-    //    var cpoint = new AMap.LngLat(X, Y);
-    //
-    //    var MSearch;
-    //    //加载服务插件，实例化地点查询类
-    //    mapObj.plugin(["AMap.PlaceSearch"], function() {
-    //        MSearch = new AMap.PlaceSearch({
-    //            city: city_location
-    //        });
-    //        //查询成功时的回调函数
-    //        AMap.event.addListener(MSearch, "complete", placeSearch_CallBack);
-    //        //周边搜索
-    //        MSearch.searchNearBy("餐厅", cpoint, 500);
-    //    });
-    //
-    //};
-
-
-
     return function(config){
         var autoComplete  = config.autoComplete;
 
@@ -265,11 +246,14 @@ var mapObj = (function(){
                     input = $("#" + self.input),
                     city = $("#" + self.city);
 
-                //清空地图上的InfoWindow和Marker
+                // 清空搜索缓存
+                autoComplete.windowsArr = [];
+                autoComplete.marker = [];
 
+                //清空地图上的InfoWindow和Marker
                 mapObj.clearMap();
 
-                var resultStr1 = "";
+                var resultStr1;
                 var poiArr = data.poiList.pois;
                 var resultCount = poiArr.length;
 
@@ -278,10 +262,15 @@ var mapObj = (function(){
                     autoComplete : autoComplete,
                     poiArr      : poiArr
                 });
+
                 mapObj.setFitView();
 
                 city.html(resultStr1);
                 city.show();
+
+                if(drag){
+                    $(".drag-wrap").css({left : 450});
+                }
 
                 city.on('mouseover', 'li', function(ev){
                     var target = ev.currentTarget;
