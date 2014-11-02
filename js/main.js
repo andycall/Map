@@ -352,6 +352,63 @@ var mapObj = (function(){
                             raiseOnDrag: true//鼠标拖拽点标记时开启点标记离开地图的效果
                         });
                         marker.setMap(mapObj);  //在地图上添加点
+                        AMap.event.addListener(marker, 'click', function(){ //鼠标点击marker弹出自定义的信息窗体
+                            infoWindow.open(mapObj, marker.getPosition());
+                        });
+                        //实例化信息窗体
+                        var infoWindow = new AMap.InfoWindow({
+                            isCustom:true,  //使用自定义窗体
+                            content:createInfoWindow('方恒假日酒店&nbsp;&nbsp;<span style="font-size:11px;color:#F00;">价格:318</span>',"<img src='http://tpc.googlesyndication.com/simgad/5843493769827749134' style='position:relative;float:left;margin:0 5px 5px 0;'>地址：北京市朝阳区阜通东大街6号院3号楼 东北 8.3 公里<br/>电话：010 64733333<br/><a href='http://baike.baidu.com/view/6748574.htm'>详细信息</a>"),
+                            offset: new AMap.Pixel(110, -25)//-113, -140
+                        });
+                        infoWindow.open(mapObj, marker.getPosition());
+                        //构建自定义信息窗体
+                        function createInfoWindow(title,content){
+                            var info = document.createElement("div");
+                            info.className = "info";
+
+                            //可以通过下面的方式修改自定义窗体的宽高
+                            //info.style.width = "400px";
+
+                            // 定义顶部标题
+                            var top = document.createElement("div");
+                            top.className = "info-top";
+                            var titleD = document.createElement("div");
+                            titleD.innerHTML = title;
+                            var closeX = document.createElement("img");
+                            closeX.src = "http://webapi.amap.com/images/close2.gif";
+                            closeX.onclick = closeInfoWindow;
+
+                            top.appendChild(titleD);
+                            top.appendChild(closeX);
+                            info.appendChild(top);
+
+
+                            // 定义中部内容
+                            var middle = document.createElement("div");
+                            middle.className = "info-middle";
+                            middle.style.backgroundColor='white';
+                            middle.innerHTML = content;
+                            info.appendChild(middle);
+
+                            // 定义底部内容
+                            var bottom = document.createElement("div");
+                            bottom.className = "info-bottom";
+                            bottom.style.position = 'relative';
+                            bottom.style.top = '0px';
+                            bottom.style.margin = '0 auto';
+                            var sharp = document.createElement("img");
+                            sharp.src = "http://webapi.amap.com/images/sharp.png";
+                            bottom.appendChild(sharp);
+                            info.appendChild(bottom);
+                            return info;
+                        }
+
+                        //关闭信息窗体
+                        function closeInfoWindow(){
+                            mapObj.clearInfoWindow();
+                        }
+
                         _cont.off('mousemove');
                         _cont.off('mouseup');
                         _dNode.css({top: 0, left: 0});
@@ -370,14 +427,6 @@ var mapObj = (function(){
                     return {x: pixel.getX(), y: pixel.getY()};
                 }
 
-//                var marker = new AMap.Marker({
-//                    position: mapObj.getCenter(),
-//                    draggable:true, //点标记可拖拽
-//                    cursor:'move',  //鼠标悬停点标记时的鼠标样式
-//                    raiseOnDrag:true//鼠标拖拽点标记时开启点标记离开地图的效果
-//
-//                });
-//                marker.setMap(mapObj);
                 //TODO for debug
                 //AMap.event.addListener(mapObj, 'click', function(e){
                 //    console.log(e.lnglat.getLng(), e.lnglat.getLat());
