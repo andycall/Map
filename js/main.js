@@ -4,7 +4,9 @@ var mapObj = (function(){
 
     return function(config){
         var autoComplete  = config.autoComplete;
+
         var drag = config.drag;
+
         // 自动补全模块 + 地图响应
         if(autoComplete){
 
