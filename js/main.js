@@ -93,11 +93,6 @@ var mapObj = (function(){
                 var resultStr = "";
                 var tipArr = data.tips;
                 if (tipArr&&tipArr.length>0) {
-                    //for (var i = 0; i < tipArr.length; i++) {
-                    //    resultStr += "<div class='divid' id='divid"  + (i + 1) + "' data-mouseover=" + (i + 1)
-                    //    + " data-select=" + i + " data-mouseout=" + (i + 1)
-                    //     + "data=" + tipArr[i].adcode + ">" + tipArr[i].name + "<span style='color:#C1C1C1;'>"+ tipArr[i].district + "</span></div>";
-                    //}
                     resultStr = _.template($("#list_template").html())({ tipArr : tipArr});
                 }
 
@@ -307,7 +302,6 @@ var mapObj = (function(){
                     autoComplete.keydown.call(config.autoComplete);
                 });
             }
-
         };
 
         if(drag){
