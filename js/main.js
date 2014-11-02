@@ -1,14 +1,13 @@
 var mapObj = (function(){
     var mapObj = new AMap.Map("container",{
             view: new AMap.View2D({
-                center:new AMap.LngLat(106.53791,29.549537),//地图中心点
                 zoom:12 //地图显示的缩放级别
             }),
             keyboardEnable:false
         }),
         d = document,
-        city_location = "重庆",
-        city_bound = {};
+        city_location = "重庆", // 默认位置
+        city_bound = {}; // 初始位置信息
 
     // 获取用户位置信息
     mapObj.getCityInfo = (function(){
@@ -24,19 +23,49 @@ var mapObj = (function(){
                     city_bound = result.bounds;
                 }
                 else {
-                    document.getElementById('info').innerHTML = "您当前所在城市："+result.info+"";
+                    city_location = result.info;
                 }
             });
             AMap.event.addListener(citysearch, "error", function(result){alert(result.info);});
         });
     })();
 
-
     // 逆地理编码
-    mapObj.getCoder = function(){
+    mapObj.getCoder = function(X, Y, callback){
+        var lnglatXY = new AMap.LngLat(X, Y);
 
+        mapObj.plugin(["AMap.Geocoder"], function() {
+            MGeocoder = new AMap.Geocoder({
+                radius: 1000,
+                extensions: "all"
+            });
+            //返回地理编码结果
+            AMap.event.addListener(MGeocoder, "complete", callback);
+            //逆地理编码
+            MGeocoder.getAddress(lnglatXY);
+        });
     };
 
+    // 坐标信息显示框
+    mapObj.pointWindow = function(X, Y){
+        var self = this;
+
+        self.getCoder(X, Y, function(data){
+            //debugger;
+            console.log(data);
+            var template = _.template($("#point_template").html())({
+                data : data.regeocode.addressComponent
+            });
+
+            var infoWindow = new AMap.InfoWindow({
+                content: template,
+                size:new AMap.Size(300, 0),
+                autoMove: true,
+                offset:new AMap.Pixel(0,-30)
+            });
+            infoWindow.open(mapObj, new AMap.LngLat(X, Y))
+        });
+    };
 
     //mapObj.getPlace = function(X, Y){
     //    var cpoint = new AMap.LngLat(X, Y);
@@ -365,8 +394,6 @@ var mapObj = (function(){
                     autoComplete.keydown.call(config.autoComplete);
                 });
             }
-
-
         };
 
         if(drag){

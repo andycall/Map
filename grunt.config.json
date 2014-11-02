@@ -1,0 +1,7 @@
+{
+    "name": "Map",
+    "js": ["js/*.js"],
+    "css": ["css/*.css"],
+    "needTag": false,
+    "depth": 1
+}

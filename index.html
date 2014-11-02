@@ -56,6 +56,14 @@
     <p>附近有<span>4</span>家餐厅</p>
 </script>
 
+<!-- 头顶信息展示模板 -->
+<script type="text/template" id="point_template">
+    <h2 class=""><%= data.district %></h2>
+    <p><%= data.street %> <%= data.streetNumber %>号</p>
+    <p>附近有<span>4</span>家餐厅</p>
+</script>
+
+
 <!-- 地点列表模板 -->
 <script type="text/template" id="list_template">
     <% tipArr.forEach(function(value, index){ %>
