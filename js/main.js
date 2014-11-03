@@ -270,6 +270,7 @@ var mapObj = (function(){
 
                 if(drag){
                     $(".drag-wrap").css({left : 450});
+                    drag.funcs.updateDragPosition();
                 }
 
                 city.on('mouseover', 'li', function(ev){
@@ -386,7 +387,7 @@ var mapObj = (function(){
         };
 
         if(drag){
-            (function (){
+            drag.funcs = (function (){
                 var _dNode = $('.drag-pin'),
                     _cont = $('.container'),
                     _patchDragOriOffset = _dNode.offset();
@@ -394,6 +395,7 @@ var mapObj = (function(){
                 function mousedown(eve){
                     var _patchH = parseInt($(this).css('height')),
                         _patchW = parseInt($(this).css('width')) / 2;
+
                     _dNode.addClass('drag-ing');
                     var _patchContOffset = _cont.offset(),
                         _patchDragWrapOffset;
@@ -473,7 +475,12 @@ var mapObj = (function(){
                 //AMap.event.addListener(mapObj, 'click', function(e){
                 //    console.log(e.lnglat.getLng(), e.lnglat.getLat());
                 //});
-
+                return {
+                    updateDragPosition: function (){
+                        _patchDragOriOffset = _dNode.offset();
+                        _patchDragOriOffset.left -= _cont.offset().left;
+                    }
+                };
             })();
         }else{
             $('.drap-main').css('display', 'none');
