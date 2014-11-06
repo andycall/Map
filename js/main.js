@@ -213,7 +213,6 @@ var mapObj = (function(){
                     d.getElementById(input).onfocus = self.focus_callback;
                 }
                 //截取输入提示的关键字部分
-                //debugger;
 
                 var text = d.getElementById("divid" + (index + 1)).innerHTML.replace(/\s|<[^>].*?>.*<\/[^>].*?>/g,"");
 
@@ -222,7 +221,9 @@ var mapObj = (function(){
                 d.getElementById(result).style.display = "none";
                 //根据选择的输入提示关键字查询
                 mapObj.plugin(["AMap.PlaceSearch"], function() {
-                    var msearch = new AMap.PlaceSearch();  //构造地点查询类
+                    var msearch = new AMap.PlaceSearch({
+                        pageSize : 40
+                    });  //构造地点查询类
                     AMap.event.addListener(msearch, "complete", self.placeSearch_CallBack); //查询成功时的回调函数
                     msearch.setCity(cityCode);
                     msearch.search(text);  //关键字查询
@@ -240,33 +241,109 @@ var mapObj = (function(){
                 }
             };
 
+            autoComplete.render = function(){
+                var self = this,
+                    city = $("#" + self.city),
+                    poil = self.poil;
+
+                console.log(self.resultIndex, self.resultEnd);
+                var poiArr = poil.slice(self.resultIndex, self.resultEnd);
+
+
+                var resultCount = poil.length / 10;
+
+                var resultStr1 = _.template($("#place_template").html())({
+                    resultCount : resultCount,
+                    resultIndex : self.resultIndex,
+                    autoComplete : self,
+                    poiArr      : poiArr,
+                    poil        : poil
+                });
+
+
+                mapObj.setFitView();
+
+                city.html(resultStr1);
+                city.show();
+
+                $(".nextGroup").on('click', self.bindNext);
+                $(".prevGroup").on('click', self.bindPrev);
+
+            };
+
+            autoComplete.bindNext = function(ev){
+                var self = autoComplete,
+                    city = $("#" + self.city),
+                    currentTarget = ev.currentTarget;
+
+                if(!currentTarget.className == "nextGroup") return;
+
+                self.resultIndex += 10;
+                self.resultEnd += 10;
+
+                if(self.resultEnd > self.poil.length){
+                    self.resultEnd = self.poil.length;
+                }
+
+                self.changePage(self.resultIndex, self.resultEnd);
+                self.render();
+
+                city.animate({
+                    scrollTop : 0
+                });
+            };
+
+            autoComplete.bindPrev = function(ev){
+                var self = autoComplete,
+                    city = $("#" + self.city),
+                    currentTarget = ev.currentTarget;
+
+                if(!currentTarget.className == "prevGroup") return;
+
+                self.resultIndex -= 10;
+                self.resultEnd -= 10;
+
+                self.changePage(self.resultIndex, self.resultEnd);
+                self.render();
+
+                city.animate({
+                    scrollTop : 0
+                });
+            };
+
             //输出关键字查询结果的回调函数
             autoComplete.placeSearch_CallBack = function(data){
                 var self = autoComplete,
                     input = $("#" + self.input),
                     city = $("#" + self.city);
 
+//                console.log(data);
                 // 清空搜索缓存
+
+                // 向后端要订餐的数据
+
+                var restaurant = [];
+
+                var poil = data.poiList.pois;
+
+                for(var i = 0,len = poil.length; i < len; i ++){
+                    restaurant.push([poil[i].location.A, poil[i].location.D]);
+                }
+
+                var restaurantResult = [];
+
                 autoComplete.windowsArr = [];
                 autoComplete.marker = [];
+                autoComplete.data = data;
+                autoComplete.resultIndex = 0;
+                autoComplete.resultEnd  = 10;
+                autoComplete.poil = poil;
+                autoComplete.restaurantResult = restaurantResult;
 
                 //清空地图上的InfoWindow和Marker
                 mapObj.clearMap();
 
-                var resultStr1;
-                var poiArr = data.poiList.pois;
-                var resultCount = poiArr.length;
-
-                resultStr1 = _.template($("#place_template").html())({
-                    resultCount : resultCount,
-                    autoComplete : autoComplete,
-                    poiArr      : poiArr
-                });
-
-                mapObj.setFitView();
-
-                city.html(resultStr1);
-                city.show();
+                self.render();
 
                 if(drag){
                     $(".drag-wrap").css({left : 450});
@@ -281,6 +358,10 @@ var mapObj = (function(){
                     }
                 });
 
+
+                $("#search_list").on('click', 'span' , self.bindNext);
+                $(".prevGroup").on('click', self.bindPrev);
+
                 city.on('mouseout', 'li', function(ev){
                     var target = ev.currentTarget;
                     if(target.className == 'secid'){
@@ -289,18 +370,26 @@ var mapObj = (function(){
                     }
                 });
 
-                city.on('click', 'li', function(ev){
-                    var target = ev.currentTarget;
-                    if(target.className == 'secid'){
-                        var dataMouseover = parseInt(target.dataset['mouseover']);
-                        self.openMarkerTipById1(dataMouseover, target, resultCount);
-                    }
-                });
+//                city.on('click', 'li', function(ev){
+//                    var target = ev.currentTarget;
+//                    if(target.className != 'secid') return;
+//                    console.log(2);
+//
+//
+//                    var dataMouseover = parseInt(target.dataset['mouseover']);
+//                    console.log(dataMouseover);
+//                    self.openMarkerTipById1(dataMouseover, target, resultCount);
+//
+//                });
             };
 
             //鼠标滑过查询结果改变背景样式，根据id打开信息窗体
             autoComplete.openMarkerTipById1 = function(pointid, that, resultCount){
-                that.style.background = '#CAE1FF';
+
+                if(that){
+                    that.style.background = '#CAE1FF';
+                }
+
                 autoComplete.windowsArr[pointid].open(mapObj, autoComplete.marker[pointid]);
 
                 for(var i = 0; i < resultCount; i ++){
@@ -313,6 +402,23 @@ var mapObj = (function(){
                     value.className = "icon icon" + (parseInt(pointid) + 1);
                 });
             };
+
+
+
+            autoComplete.changePage = function(start, end){
+                autoComplete.windowsArr[start].open(mapObj, autoComplete.marker[start]);
+                for(var i = 0; i < end - start; i ++){
+                    $(".icon" + (i + 1)).each(function(index, value){
+                        value.className = "icon icon" + ( i + 1 ) + "_b";
+                    });
+                }
+
+                $(".icon" + (parseInt(start) + 1) + "_b").each(function(index, value){
+                    value.className = "icon icon" + (parseInt(start) + 1);
+                });
+
+            };
+
 
             autoComplete.onmouseout_iconStyle = function(pointid, self){
                 self.style.background = "";
@@ -351,26 +457,6 @@ var mapObj = (function(){
                 autoComplete.windowsArr.push(infoWindow);
                 var aa = function (e) {infoWindow.open(mapObj, mar.getPosition());};
                 AMap.event.addListener(mar, "click", aa);
-            };
-
-
-            autoComplete.TipContents = function(type, address, tel){
-                var self = this,
-                    input = self.input,
-                    result = self.result;
-
-                if (type == "" || type == "undefined" || type == null || type == " undefined" || typeof type == "undefined") {
-                    type = "暂无";
-                }
-                if (address == "" || address == "undefined" || address == null || address == " undefined" || typeof address == "undefined") {
-                    address = "暂无";
-                }
-                if (tel == "" || tel == "undefined" || tel == null || tel == " undefined" || typeof address == "tel") {
-                    tel = "暂无";
-                }
-                var str = "  地址：" + address + "<br />  电话：" + tel + " <br />  类型：" + type;
-
-                return str;
             };
         }
         else{

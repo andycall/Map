@@ -35,16 +35,29 @@
 
 <!-- Template  -->
 <script type="text/template" id="place_template">
-    <div>共<span>20</span>地址</div>
-    <ul>
-        <% for(var i = 0; i < resultCount; i ++){ %>
+    <div>共<span><%= poil.length %></span>地址</div>
+    <ul id="search_list">
+        <% for(var i = 0,len = poiArr.length; i < len ; i ++){ %>
         <li class="secid" data-mouseover="<%= i %>" data-mouseout="<%= i + 1 %>">
             <div class="icon icon<%= i + 1 %>_b"></div>
             <h2><%= poiArr[i].name %></h2>
             <span><%= poiArr[i].address %></span>
             <p>还有N个城市</p>
         </li>
-        <%  autoComplete.addmarker(i, poiArr[i]); %>
+        <% } %>
+
+        <% for(var i = 0,len = poil.length; i < len; i ++ ){ %>
+           <% autoComplete.addmarker(i, poil[i]); %>
+        <% } %>
+        <% if((resultIndex / 10) >  0){ %>
+            <a href="#" class="prevGroup">&lt;&lt;&lt;</a>
+        <% } %>
+
+        <% for(var i = 0; i < resultCount; i ++){ %>
+            <span class="<%= i == (resultIndex / 10) ? 'now' : '' %>"><%= i + 1 %></span>
+        <% } %>
+        <% if(resultIndex  + 10 <  poil.length){ %>
+            <a href="#" class="nextGroup">&gt;&gt;&gt;</a>
         <% } %>
     </ul>
 </script>
