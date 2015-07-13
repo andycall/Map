@@ -530,8 +530,9 @@ var mapObj = (function(){
                         });
 
                         AMap.event.addListener(marker, 'mouseup', function(){ //鼠标点击marker弹出自定义的信息窗体
-                            var e = window.event, o = $(marker.$.r.B).offset();
-                            var containerPixelPos = fromContainerPixelToLngLat(o.left - _patchContOffset.left + 7, o.top - _patchContOffset.top + 2 *_patchH)
+                            var e = window.event, o = marker.getPosition();
+                            console.log(o);
+                            var containerPixelPos = fromContainerPixelToLngLat(o.lng, o.lat)
                             var infoWindow = new AMap.InfoWindow({
                                 isCustom: true,  //使用自定义窗体
                                 content: mapObj.pointWindow(containerPixelPos.lng, containerPixelPos.lat),
